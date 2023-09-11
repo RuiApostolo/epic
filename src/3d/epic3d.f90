@@ -28,9 +28,13 @@ program epic3d
     use field_diagnostics_netcdf, only : field_stats_io_timer
     use inversion_mod, only : vor2vel_timer, vtend_timer
     use inversion_utils, only : init_inversion, finalise_inversion
-    use parcel_interpl, only : grid2par_timer, &
-                               par2grid_timer, &
-                               halo_swap_timer
+    use parcel_interpl, only : grid2par_timer     &
+                             , par2grid_timer     &
+                             , array0ing_timer    &
+                             , parcel_loop_timer  &
+                             , boundary_timer     &
+                             , sanity_check_timer &
+                             , halo_swap_timer
     use parcel_init, only : init_timer
     use ls_rk, only : ls_rk_step, rk_timer, ls_rk_setup
     use utils, only : write_last_step, setup_output_files        &
@@ -83,9 +87,12 @@ program epic3d
             call register_timer('vor2vel', vor2vel_timer)
             call register_timer('vorticity tendency', vtend_timer)
             call register_timer('parcel push', rk_timer)
-            call register_timer('merge nearest', merge_nearest_timer)
-            call register_timer('merge tree resolve', merge_tree_resolve_timer)
+            call register_timer('merge nearest', merge_nearest_timer)            call register_timer('merge tree resolve', merge_tree_resolve_timer)
             call register_timer('p2g/v2g halo (non-excl.)', halo_swap_timer)
+            call register_timer('Array zeroing', array0ing_timer)
+            call register_timer('Parcel loop', parcel_loop_timer)
+            call register_timer('Boundary', boundary_timer)
+            call register_timer('Sanity checks', sanity_check_timer)
 
             call start_timer(epic_timer)
 
