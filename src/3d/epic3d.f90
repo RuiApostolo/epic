@@ -33,7 +33,6 @@ program epic3d
                              , array0ing_timer    &
                              , parcel_loop_timer  &
                              , boundary_timer     &
-                             , sanity_check_timer &
                              , halo_swap_timer
     use parcel_init, only : init_timer
     use ls_rk, only : ls_rk_step, rk_timer, ls_rk_setup
@@ -93,7 +92,6 @@ program epic3d
             call register_timer('Array zeroing', array0ing_timer)
             call register_timer('Parcel loop', parcel_loop_timer)
             call register_timer('Boundary', boundary_timer)
-            call register_timer('Sanity checks', sanity_check_timer)
 
             call start_timer(epic_timer)
 
