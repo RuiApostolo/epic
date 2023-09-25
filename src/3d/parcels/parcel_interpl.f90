@@ -41,9 +41,12 @@ module parcel_interpl
     ! interpolation weights
     double precision :: weights(0:1,0:1,0:1)
 
-    integer :: par2grid_timer, &
-               grid2par_timer, &
-               halo_swap_timer
+    integer :: par2grid_timer     &
+             , grid2par_timer     &
+             , array0ing_timer    &
+             , parcel_loop_timer  &
+             , boundary_timer     &
+             , halo_swap_timer
 
     integer, parameter :: IDX_VOL_SWAP    = 1   &
                         , IDX_VOR_X_SWAP  = 2   &
@@ -61,13 +64,16 @@ module parcel_interpl
     integer, parameter :: n_field_swap = 7
 #endif
 
-    public :: par2grid          &
-            , vol2grid          &
-            , grid2par          &
-            , par2grid_timer    &
-            , grid2par_timer    &
+    public :: par2grid           &
+            , vol2grid           &
+            , grid2par           &
+            , par2grid_timer     &
+            , grid2par_timer     &
             , halo_swap_timer    &
-            , trilinear
+            , array0ing_timer    &
+            , parcel_loop_timer  &
+            , boundary_timer     &
+            , trilinear         
 
     contains
 
@@ -140,6 +146,9 @@ module parcel_interpl
 
             call start_timer(par2grid_timer)
 
+            ! start array_zeroing timer
+            call start_timer(array0ing_timer)
+
             vortg = zero
             volg = zero
             nparg = zero
@@ -149,6 +158,14 @@ module parcel_interpl
             humg = zero
 #endif
             tbuoyg = zero
+
+            ! stop array_zeroing timer
+            call stop_timer(array0ing_timer)
+
+
+            ! start parcel_loop timer
+            call start_timer(parcel_loop_timer)
+
             !$omp parallel default(shared)
 #ifndef ENABLE_DRY_MODE
             !$omp do private(n, p, l, i, j, k, points, pvol, weight, btot, q_c) &
@@ -232,9 +249,17 @@ module parcel_interpl
                 call mpi_exit_on_error("par2grid: Wrong total number of parcels!")
             endif
 
+            ! stop parcel_loop timer
+            call stop_timer(parcel_loop_timer)
+
             call start_timer(halo_swap_timer)
             call par2grid_halo_swap
             call stop_timer(halo_swap_timer)
+
+
+            ! start boundary timer
+            call start_timer(boundary_timer)
+
 
             !$omp parallel workshare
             ! apply free slip boundary condition
@@ -300,6 +325,9 @@ module parcel_interpl
             tbuoyg(-1,   :, :) = two * tbuoyg(0,  :, :) - tbuoyg(1, :, :)
             tbuoyg(nz+1, :, :) = two * tbuoyg(nz, :, :) - tbuoyg(nz-1, :, :)
             !$omp end parallel workshare
+
+            ! stop boundary timer
+            call stop_timer(boundary_timer)
 
             call stop_timer(par2grid_timer)
 
@@ -392,6 +420,9 @@ module parcel_interpl
 
             call start_timer(grid2par_timer)
 
+            ! start array_zeroing timer
+            call start_timer(array0ing_timer)
+
             ! clear old data efficiently
             if (present(add)) then
                if (add .eqv. .false.) then
@@ -414,6 +445,13 @@ module parcel_interpl
                 !$omp end do
                 !$omp end parallel
             endif
+
+            ! stop array_zerioing timer
+            call stop_timer(array0ing_timer)
+
+
+            ! start parcel_loop timer
+            call start_timer(parcel_loop_timer)
 
             !$omp parallel default(shared)
             !$omp do private(n, l, p, points, is, js, ks, weights)
@@ -446,6 +484,9 @@ module parcel_interpl
             !$omp end do
             !$omp end parallel
 
+            ! stop parcel_loop timer
+            call stop_timer(parcel_loop_timer)
+
             call stop_timer(grid2par_timer)
 
         end subroutine grid2par
@@ -462,7 +503,7 @@ module parcel_interpl
             integer,          intent(out) :: ii, jj, kk
             double precision, intent(out) :: ww(0:1,0:1,0:1)
             double precision              :: xyz(3)
-            double precision              :: w00, w10, w01, w11
+            double precision              :: wt(0:1, 0:1)
             double precision              :: px, py, pz, pxc, pyc, pzc
 
 
@@ -481,20 +522,31 @@ module parcel_interpl
             pz = xyz(3) - dble(kk)
             pzc = one - pz
 
-            w00 = pyc * pxc
-            w10 = pyc * px
-            w01 = py * pxc
-            w11 = py * px
+            !w00 = pyc * pxc
+            !w10 = pyc * px
+            !w01 = py * pxc
+            !w11 = py * px
 
             ! Note order of indices is k,j,i
-            ww(0,0,0) = pzc * w00
-            ww(0,0,1) = pzc * w10
-            ww(0,1,0) = pzc * w01
-            ww(0,1,1) = pzc * w11
-            ww(1,0,0) = pz * w00
-            ww(1,0,1) = pz * w10
-            ww(1,1,0) = pz * w01
-            ww(1,1,1) = pz * w11
+            !ww(0,0,0) = pzc * w00
+            !ww(0,0,1) = pzc * w10
+            !ww(0,1,0) = pzc * w01
+            !ww(0,1,1) = pzc * w11
+            !ww(1,0,0) = pz * w00
+            !ww(1,0,1) = pz * w10
+            !ww(1,1,0) = pz * w01
+            !ww(1,1,1) = pz * w11
+
+            ! can we do:
+            wt(0, 0) = pyc * pxc
+            wt(0, 1) = pyc * px
+            wt(1, 0) = py * pxc
+            wt(1, 1) = py * px
+
+            ww(0,:,:) = pzc * wt
+            ww(1,:,:) = pz * wt
+            ! end
+
 
         end subroutine trilinear
 
