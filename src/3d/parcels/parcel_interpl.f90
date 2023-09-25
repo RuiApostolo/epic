@@ -538,13 +538,13 @@ module parcel_interpl
             !ww(1,1,1) = pz * w11
 
             ! can we do:
-            wt(0, 0) = pyc * pxc
-            wt(0, 1) = pyc * px
-            wt(1, 0) = py * pxc
-            wt(1, 1) = py * px
+            wt(0, 0) = pzc * pyc
+            wt(0, 1) = pzc * py
+            wt(1, 0) = pz * pyc
+            wt(1, 1) = pz * py
 
-            ww(0,:,:) = pzc * wt
-            ww(1,:,:) = pz * wt
+            ww(:,:,0) = pxc * wt
+            ww(:,:,1) = px * wt
             ! end
 
 
