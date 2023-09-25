@@ -28,9 +28,12 @@ program epic3d
     use field_diagnostics_netcdf, only : field_stats_io_timer
     use inversion_mod, only : vor2vel_timer, vtend_timer
     use inversion_utils, only : init_inversion, finalise_inversion
-    use parcel_interpl, only : grid2par_timer, &
-                               par2grid_timer, &
-                               halo_swap_timer
+    use parcel_interpl, only : grid2par_timer  &
+                             , par2grid_timer  &
+                             , array0ing_timer    &
+                             , parcel_loop_timer  &
+                             , boundary_timer     & 
+                             , halo_swap_timer
     use parcel_init, only : init_timer
     use ls_rk, only : ls_rk_step, rk_timer, ls_rk_setup
     use utils, only : write_last_step, setup_output_files        &
