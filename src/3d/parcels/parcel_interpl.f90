@@ -481,6 +481,27 @@ module parcel_interpl
                     enddo
                 enddo
             enddo
+
+
+            ! 1st -> trilenear to array
+            !do n = 1, n_parcels:
+
+              ! strain
+              !points = get_ellipsoid_points()
+              !call trilinear_vec()
+              ! weights_vec(4, 2, 2, 2)
+              ! is, js, ks (4)
+              ! check for matching cells
+              ! if we have matching cells, combine weights
+              ! new_weights(4, 2, 2, 2) -> can contain 1 to 4 valid values
+              ! new_is, js, ks
+              ! number_valid_cells - int
+              !do z = 1, number_valid_cells:
+                !parcel updates
+              !end do
+            !end do
+
+
             !$omp end do
             !$omp end parallel
 
