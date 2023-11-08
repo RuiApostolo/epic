@@ -140,7 +140,7 @@ module sta3dfft
             double precision, intent(out) :: fs(box%lo(3):box%hi(3),   & !Spectral
                                                 box%lo(2):box%hi(2),   &
                                                 box%lo(1):box%hi(1))
-            integer                       :: i, j
+            integer                       :: i
 
             ! 1. Transform from (z, y, x) to (y, x, z) pencil
             ! 2. Do y transform
@@ -166,8 +166,8 @@ module sta3dfft
             !     enddo
             ! enddo
 
-            do j = 1, size(fft_in_y_buffer, 3)
-                call forfft(size(fft_in_y_buffer, 1), size(fft_in_y_buffer, 2), fft_in_y_buffer(:, :, j), ytrig, yfactors)
+            do i = 1, size(fft_in_y_buffer, 3)
+                call forfft(size(fft_in_y_buffer, 1), size(fft_in_y_buffer, 2), fft_in_y_buffer(:, :, i), ytrig, yfactors)
             enddo
 
             call transpose_to_pencil(x_from_y_transposition, &
@@ -184,8 +184,8 @@ module sta3dfft
             ! enddo
 
 
-            do j = 1, size(fft_in_x_buffer, 3)
-                call forfft(size(fft_in_x_buffer, 1), size(fft_in_x_buffer, 2), fft_in_x_buffer(:, :, j), xtrig, xfactors)
+            do i = 1, size(fft_in_x_buffer, 3)
+                call forfft(size(fft_in_x_buffer, 1), size(fft_in_x_buffer, 2), fft_in_x_buffer(:, :, i), xtrig, xfactors)
             enddo
 
             call transpose_to_pencil(y_from_x_transposition,    &
@@ -217,7 +217,7 @@ module sta3dfft
             double precision, intent(out) :: fp(box%hlo(3):box%hhi(3), & !Physical
                                                 box%hlo(2):box%hhi(2), &
                                                 box%hlo(1):box%hhi(1))
-            integer                       :: i, j
+            integer                       :: i
 
             ! 1. Transform to (z, y, x) to (y, x, z) pencil
             ! 2. Do y back-transform
@@ -245,8 +245,8 @@ module sta3dfft
             !         call revfft(1, size(fft_in_x_buffer, 1), fft_in_x_buffer(:, i, j), xtrig, xfactors)
             !     enddo
             ! enddo
-            do j = 1, size(fft_in_x_buffer, 3)
-                call revfft(size(fft_in_x_buffer, 1), size(fft_in_x_buffer, 2), fft_in_x_buffer(:, :, j), xtrig, xfactors)
+            do i = 1, size(fft_in_x_buffer, 3)
+                call revfft(size(fft_in_x_buffer, 1), size(fft_in_x_buffer, 2), fft_in_x_buffer(:, :, i), xtrig, xfactors)
             enddo
 
             call transpose_to_pencil(y_from_x_transposition, &
@@ -261,8 +261,8 @@ module sta3dfft
             !         call revfft(1, size(fft_in_y_buffer, 1), fft_in_y_buffer(:, i, j), ytrig, yfactors)
             !     enddo
             ! enddo
-            do j = 1, size(fft_in_y_buffer, 3)
-                call revfft(size(fft_in_y_buffer, 1), size(fft_in_y_buffer, 2), fft_in_y_buffer(:, :, j), ytrig, yfactors)
+            do i = 1, size(fft_in_y_buffer, 3)
+                call revfft(size(fft_in_y_buffer, 1), size(fft_in_y_buffer, 2), fft_in_y_buffer(:, :, i), ytrig, yfactors)
             enddo
 
             call transpose_to_pencil(z_from_y_transposition,  &
