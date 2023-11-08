@@ -77,8 +77,8 @@ module sta3dfft
             allocate(hrky(ny))
             allocate(rkz(0:nz))
             allocate(rkzi(1:nz-1))
-            allocate(xtrig(2 * nx))
-            allocate(ytrig(2 * ny))
+            allocate(xtrig(2 * nx * ny))
+            allocate(ytrig(2 * ny * nx))
             allocate(ztrig(2 * nz))
 
             !----------------------------------------------------------------------
