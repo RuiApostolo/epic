@@ -77,8 +77,8 @@ module sta3dfft
             allocate(hrky(ny))
             allocate(rkz(0:nz))
             allocate(rkzi(1:nz-1))
-            allocate(xtrig(2 * nx * ny))
-            allocate(ytrig(2 * ny * nx))
+            allocate(xtrig(2 * nx))
+            allocate(ytrig(2 * ny))
             allocate(ztrig(2 * nz))
 
             !----------------------------------------------------------------------
@@ -167,7 +167,7 @@ module sta3dfft
             ! enddo
 
             do i = 1, size(fft_in_y_buffer, 3)
-                call forfft(size(fft_in_y_buffer, 1), size(fft_in_y_buffer, 2), fft_in_y_buffer(:, :, i), ytrig, yfactors)
+                call forfft(size(fft_in_y_buffer, 2), size(fft_in_y_buffer, 1), fft_in_y_buffer(:, :, i), ytrig, yfactors)
             enddo
 
             call transpose_to_pencil(x_from_y_transposition, &
@@ -185,7 +185,7 @@ module sta3dfft
 
 
             do i = 1, size(fft_in_x_buffer, 3)
-                call forfft(size(fft_in_x_buffer, 1), size(fft_in_x_buffer, 2), fft_in_x_buffer(:, :, i), xtrig, xfactors)
+                call forfft(size(fft_in_x_buffer, 2), size(fft_in_x_buffer, 1), fft_in_x_buffer(:, :, i), xtrig, xfactors)
             enddo
 
             call transpose_to_pencil(y_from_x_transposition,    &
@@ -245,8 +245,9 @@ module sta3dfft
             !         call revfft(1, size(fft_in_x_buffer, 1), fft_in_x_buffer(:, i, j), xtrig, xfactors)
             !     enddo
             ! enddo
+
             do i = 1, size(fft_in_x_buffer, 3)
-                call revfft(size(fft_in_x_buffer, 1), size(fft_in_x_buffer, 2), fft_in_x_buffer(:, :, i), xtrig, xfactors)
+                call revfft(size(fft_in_x_buffer, 2), size(fft_in_x_buffer, 1), fft_in_x_buffer(:, :, i), xtrig, xfactors)
             enddo
 
             call transpose_to_pencil(y_from_x_transposition, &
@@ -262,7 +263,7 @@ module sta3dfft
             !     enddo
             ! enddo
             do i = 1, size(fft_in_y_buffer, 3)
-                call revfft(size(fft_in_y_buffer, 1), size(fft_in_y_buffer, 2), fft_in_y_buffer(:, :, i), ytrig, yfactors)
+                call revfft(size(fft_in_y_buffer, 2), size(fft_in_y_buffer, 1), fft_in_y_buffer(:, :, i), ytrig, yfactors)
             enddo
 
             call transpose_to_pencil(z_from_y_transposition,  &
